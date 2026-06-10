@@ -538,6 +538,8 @@
                     fontSizes[currentSizeIndex].class.split(' ').forEach(c => el.classList.add(c));
                 });
                 fontSizeDisplay.textContent = fontSizes[currentSizeIndex].label;
+                // 字體改變後高度會變，重新量測折疊狀態
+                if (collapseReady) cards.forEach(evaluateCollapse);
             }
 
             fontDec.addEventListener('click', () => {
@@ -554,8 +556,85 @@
                 }
             });
 
+            // 折疊功能狀態旗標 (需在 applyFontSize 首次呼叫前宣告)
+            let collapseReady = false;
+
             // 初始化字體大小
             applyFontSize();
+
+            // --- 折疊過長心得功能 (預設折疊，點擊展開) ---
+            const COLLAPSE_MAX = 200; // px，折疊時顯示的高度
+
+            // 建立包裝層與展開/收合按鈕 (只建立一次)，並量測是否需要折疊
+            function setupCollapse(card) {
+                const content = card.querySelector('.insight-content');
+                if (!content) return;
+                let wrap = card.querySelector('.collapse-wrap');
+                if (!wrap) {
+                    wrap = document.createElement('div');
+                    wrap.className = 'collapse-wrap relative overflow-hidden transition-[max-height] duration-300';
+                    content.parentNode.insertBefore(wrap, content);
+                    wrap.appendChild(content);
+
+                    const fade = document.createElement('div');
+                    fade.className = 'collapse-fade pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-morandi-card to-transparent';
+                    wrap.appendChild(fade);
+
+                    const btn = document.createElement('button');
+                    btn.className = 'toggle-btn mt-3 inline-flex items-center gap-1 text-sm md:text-base font-medium text-morandi-blue hover:text-morandi-slate transition-colors';
+                    wrap.parentNode.insertBefore(btn, wrap.nextSibling);
+                    btn.addEventListener('click', () => {
+                        card.classList.toggle('expanded');
+                        applyCollapseState(card);
+                    });
+                }
+                evaluateCollapse(card);
+            }
+
+            // 量測完整高度，決定是否需要折疊
+            function evaluateCollapse(card) {
+                if (card.offsetParent === null) return; // 隱藏中的卡片不量測
+                const wrap = card.querySelector('.collapse-wrap');
+                const content = card.querySelector('.insight-content');
+                const btn = card.querySelector('.toggle-btn');
+                const fade = card.querySelector('.collapse-fade');
+                wrap.style.maxHeight = 'none'; // 先解除限制以量測
+                const full = content.scrollHeight;
+                if (full > COLLAPSE_MAX + 40) {
+                    card.dataset.collapsible = 'true';
+                    btn.classList.remove('hidden');
+                    applyCollapseState(card);
+                } else {
+                    card.dataset.collapsible = 'false';
+                    card.classList.remove('expanded');
+                    btn.classList.add('hidden');
+                    fade.classList.add('hidden');
+                    wrap.style.maxHeight = 'none';
+                }
+            }
+
+            // 套用目前展開/折疊狀態
+            function applyCollapseState(card) {
+                if (card.dataset.collapsible !== 'true') return;
+                const wrap = card.querySelector('.collapse-wrap');
+                const content = card.querySelector('.insight-content');
+                const btn = card.querySelector('.toggle-btn');
+                const fade = card.querySelector('.collapse-fade');
+                const chevronDown = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>';
+                const chevronUp = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>';
+                if (card.classList.contains('expanded')) {
+                    wrap.style.maxHeight = content.scrollHeight + 'px';
+                    fade.classList.add('hidden');
+                    btn.innerHTML = '收合' + chevronUp;
+                } else {
+                    wrap.style.maxHeight = COLLAPSE_MAX + 'px';
+                    fade.classList.remove('hidden');
+                    btn.innerHTML = '展開閱讀全文' + chevronDown;
+                }
+            }
+
+            cards.forEach(setupCollapse);
+            collapseReady = true;
 
             // --- 篩選與動畫邏輯 ---
             function performFilter(selectedBook) {
@@ -709,6 +788,11 @@
                 // 確保該卡片顯示 (切回「顯示全部」)
                 performFilter('all');
                 setTimeout(() => {
+                    // 若該篇為折疊狀態，分享開啟時自動展開
+                    if (target.dataset.collapsible === 'true' && !target.classList.contains('expanded')) {
+                        target.classList.add('expanded');
+                        applyCollapseState(target);
+                    }
                     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     target.classList.add('ring-2', 'ring-morandi-sage', 'ring-offset-2', 'ring-offset-morandi-bg');
                     setTimeout(() => {
