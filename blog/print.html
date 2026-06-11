@@ -39,19 +39,24 @@
         /* 螢幕上模擬 A4 紙張的文件感 */
         .paper {
             background: #fff;
-            width: 210mm;
+            width: 210mm;          /* A4 寬 */
             max-width: 100%;
             margin: 0 auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            --pdf-font-size: 15pt; /* 預設內文字級 (可調整) */
         }
 
         .pdf-content { font-family: 'Noto Serif TC', serif; }
+        .pdf-content p {
+            font-size: var(--pdf-font-size);
+            line-height: 1.95;
+        }
 
         /* 標題不要落單在頁尾 */
         .pdf-entry-head { break-after: avoid; page-break-after: avoid; }
 
         @media print {
-            @page { margin: 18mm 16mm; }
+            @page { size: A4; margin: 18mm 16mm; }
             html, body { background: #fff !important; }
             .no-print { display: none !important; }
             .paper {
@@ -61,7 +66,8 @@
                 box-shadow: none;
             }
             .pdf-cover { break-after: page; page-break-after: always; }
-            .pdf-entry { break-inside: auto; }
+            /* 每一篇心得盡量不跨頁被截斷 */
+            .pdf-entry { break-inside: avoid; page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -69,31 +75,57 @@
 
     <!-- 控制列 (僅螢幕顯示，列印時隱藏) -->
     <header class="no-print sticky top-0 z-50 backdrop-blur-md bg-morandi-bg/90 border-b border-stone-300/50 py-4 px-6 shadow-sm">
-        <div class="max-w-4xl mx-auto flex flex-col gap-4">
+        <div class="max-w-5xl mx-auto flex flex-col gap-4">
             <div class="flex items-center gap-2">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-morandi-sage"></span>
                 <h1 class="text-lg md:text-xl font-semibold tracking-wider text-morandi-text">讀經心得・PDF 匯出</h1>
             </div>
 
-            <div class="flex flex-wrap items-end gap-4">
+            <div class="flex flex-wrap items-start gap-x-6 gap-y-4">
                 <!-- 書卷範圍 -->
                 <label class="flex flex-col gap-1">
                     <span class="text-sm md:text-base text-morandi-muted font-medium">書卷範圍</span>
                     <select id="bookSelect" class="appearance-none bg-white border border-stone-300/60 text-morandi-text py-2 px-4 rounded-xl text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 cursor-pointer shadow-sm min-w-[150px]"></select>
                 </label>
 
-                <!-- 篇章 -->
-                <label class="flex flex-col gap-1">
-                    <span class="text-sm md:text-base text-morandi-muted font-medium">篇章</span>
-                    <select id="noteSelect" class="appearance-none bg-white border border-stone-300/60 text-morandi-text py-2 px-4 rounded-xl text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 cursor-pointer shadow-sm min-w-[220px]"></select>
-                </label>
+                <!-- 篇章 (複選) -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm md:text-base text-morandi-muted font-medium">篇章 (可複選)</span>
+                        <button id="toggleAll" type="button" class="text-xs md:text-sm text-morandi-blue hover:text-morandi-slate font-medium underline">全選 / 全不選</button>
+                    </div>
+                    <div id="noteList" class="flex flex-col gap-1 max-h-44 overflow-y-auto bg-white border border-stone-300/60 rounded-xl p-3 shadow-sm min-w-[260px]"></div>
+                </div>
 
-                <button id="printBtn" class="ml-auto inline-flex items-center gap-2 bg-morandi-slate text-white py-2.5 px-6 rounded-xl text-sm md:text-base font-semibold shadow-sm hover:bg-morandi-text transition-colors">
+                <!-- 字體大小 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-sm md:text-base text-morandi-muted font-medium">內文字級</span>
+                    <div class="flex bg-white rounded-xl border border-stone-300/60 p-1 shadow-sm items-center">
+                        <button id="fontDec" type="button" class="w-9 h-9 flex items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/50" title="縮小">
+                            <span class="text-sm font-bold">A-</span>
+                        </button>
+                        <span id="fontDisplay" class="text-sm font-semibold px-2 text-morandi-muted min-w-[56px] text-center">15 pt</span>
+                        <button id="fontInc" type="button" class="w-9 h-9 flex items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/50" title="放大">
+                            <span class="text-base font-bold">A+</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 選項 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-sm md:text-base text-morandi-muted font-medium">選項</span>
+                    <label class="flex items-center gap-2 bg-white border border-stone-300/60 rounded-xl py-2 px-4 shadow-sm cursor-pointer">
+                        <input type="checkbox" id="coverChk" class="w-4 h-4 accent-morandi-slate">
+                        <span class="text-sm md:text-base text-morandi-text">加入封面頁</span>
+                    </label>
+                </div>
+
+                <button id="printBtn" type="button" class="ml-auto self-end inline-flex items-center gap-2 bg-morandi-slate text-white py-2.5 px-6 rounded-xl text-sm md:text-base font-semibold shadow-sm hover:bg-morandi-text transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"></path></svg>
                     <span>下載 / 列印 PDF</span>
                 </button>
             </div>
-            <p class="text-xs md:text-sm text-morandi-muted">選好範圍後按「下載 / 列印 PDF」，在列印視窗的「目的地」選擇「另存為 PDF」即可。</p>
+            <p class="text-xs md:text-sm text-morandi-muted">勾選要列印的篇章後按「下載 / 列印 PDF」，在列印視窗的「目的地」選擇「另存為 PDF」，紙張請選 A4。</p>
         </div>
     </header>
 
@@ -112,10 +144,16 @@
             const SRC = params.get('src') || '2026-06-reading-notes.html';
 
             const bookSelect = document.getElementById('bookSelect');
-            const noteSelect = document.getElementById('noteSelect');
+            const noteList = document.getElementById('noteList');
+            const toggleAll = document.getElementById('toggleAll');
+            const fontDec = document.getElementById('fontDec');
+            const fontInc = document.getElementById('fontInc');
+            const fontDisplay = document.getElementById('fontDisplay');
+            const coverChk = document.getElementById('coverChk');
             const printBtn = document.getElementById('printBtn');
             const statusEl = document.getElementById('status');
             const pdfBody = document.getElementById('pdfBody');
+            const paper = document.getElementById('paper');
 
             // 各書卷對應的強調色 (與心得頁一致)
             const ACCENT = {
@@ -126,6 +164,14 @@
                 '歷代志下': '#8EA4B1',
             };
             const accentOf = (book) => ACCENT[book] || '#8EA4B1';
+
+            // 內文字級 (pt)
+            let fontSize = 15;
+            const FONT_MIN = 12, FONT_MAX = 24;
+            function applyFontSize() {
+                paper.style.setProperty('--pdf-font-size', fontSize + 'pt');
+                fontDisplay.textContent = fontSize + ' pt';
+            }
 
             let notes = [];
 
@@ -158,52 +204,74 @@
             bookSelect.innerHTML = '<option value="all">所有書卷</option>'
                 + books.map(b => `<option value="${b}">${b}</option>`).join('');
 
-            // 3. 依書卷填入篇章選單
-            function refreshNoteSelect() {
-                const book = bookSelect.value;
-                const list = notes.filter(n => book === 'all' || n.book === book);
-                noteSelect.innerHTML = '<option value="all">此範圍全部 (' + list.length + ' 篇)</option>'
-                    + list.map(n => `<option value="${n.index}">${n.title}</option>`).join('');
-            }
+            const esc = (s) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-            // 4. 取得目前選取範圍的心得清單
-            function selectedNotes() {
-                if (noteSelect.value !== 'all') {
-                    return notes.filter(n => String(n.index) === noteSelect.value);
-                }
+            // 目前書卷範圍內的心得
+            function notesInScope() {
                 const book = bookSelect.value;
                 return notes.filter(n => book === 'all' || n.book === book);
             }
 
-            // 5. 範圍描述文字 (顯示於封面)
-            function scopeLabel() {
-                if (noteSelect.value !== 'all') {
-                    const n = notes.find(x => String(x.index) === noteSelect.value);
-                    return n ? n.title : '';
-                }
-                return bookSelect.value === 'all' ? '全部心得' : '《' + bookSelect.value + '》';
+            // 3. 依書卷重建篇章複選清單 (預設全部勾選)
+            function rebuildNoteList() {
+                const list = notesInScope();
+                noteList.innerHTML = list.map(n => `
+                    <label class="flex items-start gap-2 cursor-pointer py-0.5">
+                        <input type="checkbox" class="note-chk mt-1 w-4 h-4 accent-morandi-slate" value="${n.index}" checked>
+                        <span class="text-sm md:text-base text-morandi-text leading-snug">
+                            <span class="text-xs font-semibold mr-1" style="color:${accentOf(n.book)};">${esc(n.book)}</span>${esc(n.title)}
+                        </span>
+                    </label>
+                `).join('');
+                noteList.querySelectorAll('.note-chk').forEach(chk => chk.addEventListener('change', render));
             }
 
-            const esc = (s) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+            // 4. 取得勾選的心得
+            function selectedNotes() {
+                const checked = new Set(
+                    [...noteList.querySelectorAll('.note-chk:checked')].map(c => c.value)
+                );
+                return notesInScope().filter(n => checked.has(String(n.index)));
+            }
+
+            // 5. 封面範圍描述
+            function scopeLabel(list) {
+                const scope = notesInScope();
+                if (list.length === scope.length) {
+                    return bookSelect.value === 'all' ? '全部心得' : '《' + bookSelect.value + '》';
+                }
+                if (list.length === 1) return list[0].title;
+                return '精選 ' + list.length + ' 篇';
+            }
 
             // 6. 產生預覽 / 列印內容
             function render() {
                 const list = selectedNotes();
-                const today = new Date();
-                const dateStr = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+                let html = '';
 
-                // 封面
-                let html = `
-                    <section class="pdf-cover text-center flex flex-col items-center justify-center" style="min-height: 60vh;">
-                        <div class="w-3 h-3 rounded-full bg-morandi-sage mb-6"></div>
-                        <h1 class="text-3xl md:text-4xl font-bold tracking-widest text-morandi-text mb-4" style="font-family:'Noto Serif TC',serif;">頌主堂讀經心得</h1>
-                        <p class="text-base md:text-lg text-morandi-muted tracking-wide mb-10">弟兄姊妹讀經心得分享</p>
-                        <div class="w-16 border-t border-stone-300 mb-10"></div>
-                        <p class="text-lg md:text-xl text-morandi-text mb-2">${esc(scopeLabel())}</p>
-                        <p class="text-sm text-morandi-muted">共 ${list.length} 篇 ・ ${dateStr}</p>
-                        <p class="mt-12 text-sm text-morandi-muted tracking-widest" style="font-family:'Noto Serif TC',serif;">「祢的話是我腳前的燈，是我路上的光。」<br>— 詩篇 119:105</p>
-                    </section>
-                `;
+                if (list.length === 0) {
+                    pdfBody.innerHTML = '<div class="text-center text-morandi-muted py-20">請至少勾選一篇心得</div>';
+                    statusEl.classList.add('hidden');
+                    pdfBody.classList.remove('hidden');
+                    return;
+                }
+
+                // 封面 (可選，預設不含)
+                if (coverChk.checked) {
+                    const today = new Date();
+                    const dateStr = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+                    html += `
+                        <section class="pdf-cover text-center flex flex-col items-center justify-center" style="min-height: 60vh;">
+                            <div class="w-3 h-3 rounded-full bg-morandi-sage mb-6"></div>
+                            <h1 class="text-3xl md:text-4xl font-bold tracking-widest text-morandi-text mb-4" style="font-family:'Noto Serif TC',serif;">頌主堂讀經心得</h1>
+                            <p class="text-base md:text-lg text-morandi-muted tracking-wide mb-10">弟兄姊妹讀經心得分享</p>
+                            <div class="w-16 border-t border-stone-300 mb-10"></div>
+                            <p class="text-lg md:text-xl text-morandi-text mb-2">${esc(scopeLabel(list))}</p>
+                            <p class="text-sm text-morandi-muted">共 ${list.length} 篇 ・ ${dateStr}</p>
+                            <p class="mt-12 text-sm text-morandi-muted tracking-widest" style="font-family:'Noto Serif TC',serif;">「祢的話是我腳前的燈，是我路上的光。」<br>— 詩篇 119:105</p>
+                        </section>
+                    `;
+                }
 
                 // 各篇心得
                 html += list.map(n => `
@@ -212,7 +280,7 @@
                             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full" style="color:${accentOf(n.book)}; background:${accentOf(n.book)}1A;">${esc(n.book)}</span>
                             <h2 class="text-xl md:text-2xl font-bold tracking-wider text-morandi-text">${esc(n.title)}</h2>
                         </div>
-                        <p class="text-base md:text-lg leading-loose text-justify text-morandi-text" style="white-space: pre-line;">${esc(n.content)}</p>
+                        <p class="text-justify text-morandi-text" style="white-space: pre-line;">${esc(n.content)}</p>
                     </article>
                 `).join('');
 
@@ -221,25 +289,28 @@
                 pdfBody.classList.remove('hidden');
 
                 // 讓另存 PDF 的預設檔名好看一點
-                document.title = '頌主堂讀經心得 - ' + scopeLabel().replace(/[《》]/g, '');
+                document.title = '頌主堂讀經心得 - ' + scopeLabel(list).replace(/[《》]/g, '');
             }
 
             // 事件
-            bookSelect.addEventListener('change', () => { refreshNoteSelect(); render(); });
-            noteSelect.addEventListener('change', render);
+            bookSelect.addEventListener('change', () => { rebuildNoteList(); render(); });
+            toggleAll.addEventListener('click', () => {
+                const boxes = [...noteList.querySelectorAll('.note-chk')];
+                const allChecked = boxes.every(b => b.checked);
+                boxes.forEach(b => { b.checked = !allChecked; });
+                render();
+            });
+            coverChk.addEventListener('change', render);
+            fontDec.addEventListener('click', () => { if (fontSize > FONT_MIN) { fontSize--; applyFontSize(); } });
+            fontInc.addEventListener('click', () => { if (fontSize < FONT_MAX) { fontSize++; applyFontSize(); } });
             printBtn.addEventListener('click', () => window.print());
 
-            // 初始預設 (可用 ?book= 或 ?note= 預先指定)
-            refreshNoteSelect();
+            // 初始預設 (可用 ?book= 預先指定書卷)
             const preBook = params.get('book');
-            if (preBook && books.includes(preBook)) {
-                bookSelect.value = preBook;
-                refreshNoteSelect();
-            }
-            const preNote = params.get('note');
-            if (preNote && notes.some(n => String(n.index) === preNote)) {
-                noteSelect.value = preNote;
-            }
+            if (preBook && books.includes(preBook)) bookSelect.value = preBook;
+
+            applyFontSize();
+            rebuildNoteList();
             render();
         });
     </script>
