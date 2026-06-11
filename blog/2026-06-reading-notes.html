@@ -753,8 +753,14 @@
                     }
                     return;
                 }
-                const audio = new Audio(buildBaiduUrl(chunks[idx]));
+                // 先建立空的 Audio 並設 no-referrer，再指定 src。
+                // 百度端點會檢查 Referer：帶 referer (如 GitHub Pages) 時只回傳極小的空音檔，
+                // 設為 no-referrer (模擬 file:// 不送 Referer) 才能正常取得語音。
+                // 注意：不要設 crossOrigin，否則會變成 CORS 請求而被百度擋下。
+                const audio = new Audio();
+                audio.referrerPolicy = 'no-referrer';
                 ttsAudio = audio;
+                audio.src = buildBaiduUrl(chunks[idx]);
                 audio.onended = () => playChunks(chunks, idx + 1, btn, myToken);
                 audio.onerror = () => playChunks(chunks, idx + 1, btn, myToken); // 某段失敗就跳過
                 audio.play().catch(() => {
