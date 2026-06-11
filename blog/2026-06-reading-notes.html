@@ -64,9 +64,9 @@
             <div class="text-left">
                 <div class="flex items-center gap-2">
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-morandi-sage"></span>
-                    <h1 class="text-2xl font-semibold tracking-wider text-morandi-text">頌主堂讀經心得分享</h1>
+                    <h1 class="text-lg md:text-xl font-semibold tracking-wider text-morandi-text">頌主堂讀經心得分享</h1>
                 </div>
-                <p class="text-base md:text-lg text-morandi-muted mt-1 tracking-wide font-light">頌主堂・弟兄姊妹讀經心得分享</p>
+                <p class="text-sm text-morandi-muted mt-1 tracking-wide font-light">頌主堂・弟兄姊妹讀經心得分享</p>
             </div>
 
             <!-- 控制功能區 (篩選、字級、重設) -->
@@ -686,6 +686,107 @@
                 return base;
             }
 
+            // --- 導讀 (百度語音 TTS) 功能 ---
+            // 透過百度翻譯隱藏的 gettts 端點取得 mp3 音訊，用 <audio> 播放。
+            // 該端點對單次文字長度有限制，故將心得內容切成短句後依序播放。
+            const ttsSupported = true; // 改用 <audio> 播放，瀏覽器皆支援
+            let currentSpeakBtn = null;
+            let ttsAudio = null;       // 目前播放中的 Audio
+            let ttsToken = 0;          // 序號：停止/切換時讓進行中的播放鏈失效
+            const speakIconPlay = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"></path></svg>';
+            const speakIconStop = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z"></path></svg>';
+
+            // 百度語音端點：spd 語速(1-9)，lan=zh 中文
+            function buildBaiduUrl(text) {
+                return 'https://fanyi.baidu.com/gettts?lan=zh&spd=3&source=web&text=' + encodeURIComponent(text);
+            }
+
+            // 將長文字依標點切成短句 (每段控制在約 80 字以內)
+            function splitText(text) {
+                const clean = text.replace(/\s+/g, '');
+                const sentences = clean.split(/(?<=[。！？；，、,.!?;])/);
+                const chunks = [];
+                let buf = '';
+                for (const s of sentences) {
+                    if (!s) continue;
+                    if ((buf + s).length > 80) {
+                        if (buf) { chunks.push(buf); buf = ''; }
+                        if (s.length > 80) {
+                            for (let i = 0; i < s.length; i += 80) chunks.push(s.slice(i, i + 80));
+                        } else {
+                            buf = s;
+                        }
+                    } else {
+                        buf += s;
+                    }
+                }
+                if (buf) chunks.push(buf);
+                return chunks;
+            }
+
+            function setSpeakBtnState(btn, speaking) {
+                btn.innerHTML = speaking
+                    ? speakIconStop + '<span class="btn-label">停止</span>'
+                    : speakIconPlay + '<span class="btn-label">導讀</span>';
+            }
+
+            function stopSpeaking() {
+                ttsToken++; // 讓進行中的播放鏈失效
+                if (ttsAudio) {
+                    ttsAudio.pause();
+                    ttsAudio.src = '';
+                    ttsAudio = null;
+                }
+                if (currentSpeakBtn) {
+                    setSpeakBtnState(currentSpeakBtn, false);
+                    currentSpeakBtn = null;
+                }
+            }
+
+            // 依序播放每一段音訊
+            function playChunks(chunks, idx, btn, myToken) {
+                if (myToken !== ttsToken) return; // 已被停止或被其他心得取代
+                if (idx >= chunks.length) {        // 全部播完
+                    if (currentSpeakBtn === btn) {
+                        setSpeakBtnState(btn, false);
+                        currentSpeakBtn = null;
+                    }
+                    return;
+                }
+                const audio = new Audio(buildBaiduUrl(chunks[idx]));
+                ttsAudio = audio;
+                audio.onended = () => playChunks(chunks, idx + 1, btn, myToken);
+                audio.onerror = () => playChunks(chunks, idx + 1, btn, myToken); // 某段失敗就跳過
+                audio.play().catch(() => {
+                    // 瀏覽器擋自動播放：提示使用者
+                    showToast('請先點一下畫面，再按導讀');
+                    if (myToken === ttsToken && currentSpeakBtn === btn) {
+                        setSpeakBtnState(btn, false);
+                        currentSpeakBtn = null;
+                    }
+                });
+            }
+
+            function speakCard(card, btn) {
+                // 再次點擊正在朗讀的按鈕 → 停止
+                if (currentSpeakBtn === btn) {
+                    stopSpeaking();
+                    return;
+                }
+                stopSpeaking(); // 先停止其他正在朗讀的心得
+                const text = card.querySelector('.insight-content').textContent.trim();
+                if (!text) return;
+                const chunks = splitText(text);
+                if (!chunks.length) return;
+                currentSpeakBtn = btn;
+                setSpeakBtnState(btn, true);
+                const myToken = ++ttsToken;
+                playChunks(chunks, 0, btn, myToken);
+            }
+
+            // 離開頁面時停止朗讀
+            window.addEventListener('beforeunload', stopSpeaking);
+
             cards.forEach(card => {
                 const id = 'note-' + makeSlug(card);
                 card.id = id;
@@ -721,12 +822,25 @@
                     }
                 });
 
-                // 將複製、分享按鈕包成一組，靠右並排顯示
+                // 動態插入導讀按鈕 (語音朗讀心得內容)
+                let speakBtn = null;
+                if (ttsSupported) {
+                    speakBtn = document.createElement('button');
+                    speakBtn.className = 'speak-btn inline-flex items-center gap-1 text-sm md:text-base text-stone-500 hover:text-morandi-ochre px-2 py-1 rounded-lg hover:bg-stone-100 transition-colors';
+                    speakBtn.title = '朗讀這篇心得';
+                    setSpeakBtnState(speakBtn, false);
+                    speakBtn.addEventListener('click', () => speakCard(card, speakBtn));
+                }
+
+                // 將導讀、複製、分享按鈕包成一組，移到標題下方獨立一行
+                // (避免在手機上與標題擠在同一列導致標題被壓縮變形)
+                const header = copyBtn.parentNode; // 標題列
                 const btnGroup = document.createElement('div');
-                btnGroup.className = 'flex items-center gap-1 shrink-0';
-                copyBtn.parentNode.insertBefore(btnGroup, copyBtn);
+                btnGroup.className = 'flex flex-wrap items-center gap-2 mt-3';
+                if (speakBtn) btnGroup.appendChild(speakBtn);
                 btnGroup.appendChild(copyBtn);
                 btnGroup.appendChild(shareBtn);
+                header.parentNode.insertBefore(btnGroup, header.nextSibling);
             });
 
             // 載入時若網址帶有 ?note= 參數，捲動並標示對應心得
