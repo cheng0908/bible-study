@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頌主堂讀經心得・PDF 匯出</title>
+    <!-- Tailwind CSS 3.4.15 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            bg: '#F2F1EC',
+                            card: '#FAF9F6',
+                            text: '#2C3033',
+                            muted: '#7A828A',
+                            blue: '#8EA4B1',
+                            sage: '#9CAF9A',
+                            rose: '#C0A39E',
+                            ochre: '#C4B097',
+                            slate: '#606B73',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        body {
+            background-color: #E8E7E1;
+            color: #2C3033;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        /* 螢幕上模擬 A4 紙張的文件感 */
+        .paper {
+            background: #fff;
+            width: 210mm;
+            max-width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        }
+
+        .pdf-content { font-family: 'Noto Serif TC', serif; }
+
+        /* 標題不要落單在頁尾 */
+        .pdf-entry-head { break-after: avoid; page-break-after: avoid; }
+
+        @media print {
+            @page { margin: 18mm 16mm; }
+            html, body { background: #fff !important; }
+            .no-print { display: none !important; }
+            .paper {
+                width: auto;
+                max-width: none;
+                margin: 0;
+                box-shadow: none;
+            }
+            .pdf-cover { break-after: page; page-break-after: always; }
+            .pdf-entry { break-inside: auto; }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- 控制列 (僅螢幕顯示，列印時隱藏) -->
+    <header class="no-print sticky top-0 z-50 backdrop-blur-md bg-morandi-bg/90 border-b border-stone-300/50 py-4 px-6 shadow-sm">
+        <div class="max-w-4xl mx-auto flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-morandi-sage"></span>
+                <h1 class="text-lg md:text-xl font-semibold tracking-wider text-morandi-text">讀經心得・PDF 匯出</h1>
+            </div>
+
+            <div class="flex flex-wrap items-end gap-4">
+                <!-- 書卷範圍 -->
+                <label class="flex flex-col gap-1">
+                    <span class="text-sm md:text-base text-morandi-muted font-medium">書卷範圍</span>
+                    <select id="bookSelect" class="appearance-none bg-white border border-stone-300/60 text-morandi-text py-2 px-4 rounded-xl text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 cursor-pointer shadow-sm min-w-[150px]"></select>
+                </label>
+
+                <!-- 篇章 -->
+                <label class="flex flex-col gap-1">
+                    <span class="text-sm md:text-base text-morandi-muted font-medium">篇章</span>
+                    <select id="noteSelect" class="appearance-none bg-white border border-stone-300/60 text-morandi-text py-2 px-4 rounded-xl text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 cursor-pointer shadow-sm min-w-[220px]"></select>
+                </label>
+
+                <button id="printBtn" class="ml-auto inline-flex items-center gap-2 bg-morandi-slate text-white py-2.5 px-6 rounded-xl text-sm md:text-base font-semibold shadow-sm hover:bg-morandi-text transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"></path></svg>
+                    <span>下載 / 列印 PDF</span>
+                </button>
+            </div>
+            <p class="text-xs md:text-sm text-morandi-muted">選好範圍後按「下載 / 列印 PDF」，在列印視窗的「目的地」選擇「另存為 PDF」即可。</p>
+        </div>
+    </header>
+
+    <!-- PDF 預覽 (列印區域) -->
+    <main class="py-8 px-4">
+        <div id="paper" class="paper px-[18mm] py-[16mm]">
+            <div id="status" class="text-center text-morandi-muted py-20">載入心得中…</div>
+            <div id="pdfBody" class="hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 來源檔 (可用 ?src= 指定，預設為本月份心得)
+            const params = new URLSearchParams(location.search);
+            const SRC = params.get('src') || '2026-06-reading-notes.html';
+
+            const bookSelect = document.getElementById('bookSelect');
+            const noteSelect = document.getElementById('noteSelect');
+            const printBtn = document.getElementById('printBtn');
+            const statusEl = document.getElementById('status');
+            const pdfBody = document.getElementById('pdfBody');
+
+            // 各書卷對應的強調色 (與心得頁一致)
+            const ACCENT = {
+                '創世記': '#9CAF9A',
+                '出埃及記': '#C0A39E',
+                '列王紀下': '#606B73',
+                '歷代志上': '#C4B097',
+                '歷代志下': '#8EA4B1',
+            };
+            const accentOf = (book) => ACCENT[book] || '#8EA4B1';
+
+            let notes = [];
+
+            // 1. 讀取來源心得頁並解析出每一篇
+            try {
+                const res = await fetch(SRC, { cache: 'no-cache' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.querySelectorAll('.insight-card').forEach((card, i) => {
+                    const book = card.getAttribute('data-book') || '';
+                    const titleEl = card.querySelector('.card-title');
+                    const contentEl = card.querySelector('.insight-content');
+                    if (!contentEl) return;
+                    notes.push({
+                        index: i,
+                        book,
+                        title: (titleEl ? titleEl.textContent : book).trim(),
+                        content: contentEl.textContent.trim(),
+                    });
+                });
+                if (!notes.length) throw new Error('找不到任何心得');
+            } catch (err) {
+                statusEl.innerHTML = '無法載入心得（' + err.message + '）。<br>請在已發佈的網站或本機伺服器上開啟此頁（直接用 file:// 開啟會被瀏覽器擋下）。';
+                return;
+            }
+
+            // 2. 建立書卷選單 (依出現順序，不重複)
+            const books = [...new Set(notes.map(n => n.book))];
+            bookSelect.innerHTML = '<option value="all">所有書卷</option>'
+                + books.map(b => `<option value="${b}">${b}</option>`).join('');
+
+            // 3. 依書卷填入篇章選單
+            function refreshNoteSelect() {
+                const book = bookSelect.value;
+                const list = notes.filter(n => book === 'all' || n.book === book);
+                noteSelect.innerHTML = '<option value="all">此範圍全部 (' + list.length + ' 篇)</option>'
+                    + list.map(n => `<option value="${n.index}">${n.title}</option>`).join('');
+            }
+
+            // 4. 取得目前選取範圍的心得清單
+            function selectedNotes() {
+                if (noteSelect.value !== 'all') {
+                    return notes.filter(n => String(n.index) === noteSelect.value);
+                }
+                const book = bookSelect.value;
+                return notes.filter(n => book === 'all' || n.book === book);
+            }
+
+            // 5. 範圍描述文字 (顯示於封面)
+            function scopeLabel() {
+                if (noteSelect.value !== 'all') {
+                    const n = notes.find(x => String(x.index) === noteSelect.value);
+                    return n ? n.title : '';
+                }
+                return bookSelect.value === 'all' ? '全部心得' : '《' + bookSelect.value + '》';
+            }
+
+            const esc = (s) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+            // 6. 產生預覽 / 列印內容
+            function render() {
+                const list = selectedNotes();
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
+                // 封面
+                let html = `
+                    <section class="pdf-cover text-center flex flex-col items-center justify-center" style="min-height: 60vh;">
+                        <div class="w-3 h-3 rounded-full bg-morandi-sage mb-6"></div>
+                        <h1 class="text-3xl md:text-4xl font-bold tracking-widest text-morandi-text mb-4" style="font-family:'Noto Serif TC',serif;">頌主堂讀經心得</h1>
+                        <p class="text-base md:text-lg text-morandi-muted tracking-wide mb-10">弟兄姊妹讀經心得分享</p>
+                        <div class="w-16 border-t border-stone-300 mb-10"></div>
+                        <p class="text-lg md:text-xl text-morandi-text mb-2">${esc(scopeLabel())}</p>
+                        <p class="text-sm text-morandi-muted">共 ${list.length} 篇 ・ ${dateStr}</p>
+                        <p class="mt-12 text-sm text-morandi-muted tracking-widest" style="font-family:'Noto Serif TC',serif;">「祢的話是我腳前的燈，是我路上的光。」<br>— 詩篇 119:105</p>
+                    </section>
+                `;
+
+                // 各篇心得
+                html += list.map(n => `
+                    <article class="pdf-entry pdf-content mb-10 pb-8 border-b border-stone-200" style="border-left: 4px solid ${accentOf(n.book)}; padding-left: 18px;">
+                        <div class="pdf-entry-head flex items-baseline gap-3 mb-4">
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full" style="color:${accentOf(n.book)}; background:${accentOf(n.book)}1A;">${esc(n.book)}</span>
+                            <h2 class="text-xl md:text-2xl font-bold tracking-wider text-morandi-text">${esc(n.title)}</h2>
+                        </div>
+                        <p class="text-base md:text-lg leading-loose text-justify text-morandi-text" style="white-space: pre-line;">${esc(n.content)}</p>
+                    </article>
+                `).join('');
+
+                pdfBody.innerHTML = html;
+                statusEl.classList.add('hidden');
+                pdfBody.classList.remove('hidden');
+
+                // 讓另存 PDF 的預設檔名好看一點
+                document.title = '頌主堂讀經心得 - ' + scopeLabel().replace(/[《》]/g, '');
+            }
+
+            // 事件
+            bookSelect.addEventListener('change', () => { refreshNoteSelect(); render(); });
+            noteSelect.addEventListener('change', render);
+            printBtn.addEventListener('click', () => window.print());
+
+            // 初始預設 (可用 ?book= 或 ?note= 預先指定)
+            refreshNoteSelect();
+            const preBook = params.get('book');
+            if (preBook && books.includes(preBook)) {
+                bookSelect.value = preBook;
+                refreshNoteSelect();
+            }
+            const preNote = params.get('note');
+            if (preNote && notes.some(n => String(n.index) === preNote)) {
+                noteSelect.value = preNote;
+            }
+            render();
+        });
+    </script>
+</body>
+</html>
