@@ -23,6 +23,7 @@
                             rose: '#C0A39E',     // 莫蘭迪霧粉
                             ochre: '#C4B097',    // 莫蘭迪暖燕麥
                             slate: '#606B73',    // 石板青
+                            plum: '#A88C93',     // 莫蘭迪紫棕 (主日講道)
                         }
                     }
                 }
@@ -77,12 +78,13 @@
                 <!-- 書卷篩選下拉選單 -->
                 <div class="relative min-w-[160px]">
                     <select id="bookSelect" class="w-full appearance-none bg-morandi-card border border-stone-300/50 text-morandi-text py-2.5 px-4 pr-10 rounded-full text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 focus:border-morandi-blue cursor-pointer shadow-sm transition-all duration-300">
-                        <option value="all">🔍 所有書卷</option>
+                        <option value="all">🔍 所有分類</option>
                         <option value="創世記">創世記</option>
                         <option value="出埃及記">出埃及記</option>
                         <option value="列王紀下">列王紀下</option>
                         <option value="歷代志上">歷代志上</option>
                         <option value="歷代志下">歷代志下</option>
+                        <option value="主日講道">主日講道</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-morandi-muted">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
@@ -130,6 +132,7 @@
             <button class="tag-btn px-4 py-1.5 rounded-full text-base md:text-lg font-medium bg-white text-morandi-muted hover:bg-morandi-slate hover:text-white transition-all shadow-sm" data-target="列王紀下">列王紀下</button>
             <button class="tag-btn px-4 py-1.5 rounded-full text-base md:text-lg font-medium bg-white text-morandi-muted hover:bg-morandi-ochre hover:text-white transition-all shadow-sm" data-target="歷代志上">歷代志上</button>
             <button class="tag-btn px-4 py-1.5 rounded-full text-base md:text-lg font-medium bg-white text-morandi-muted hover:bg-morandi-sage hover:text-white transition-all shadow-sm" data-target="歷代志下">歷代志下</button>
+            <button class="tag-btn px-4 py-1.5 rounded-full text-base md:text-lg font-medium bg-white text-morandi-muted hover:bg-morandi-plum hover:text-white transition-all shadow-sm" data-target="主日講道">主日講道</button>
         </div>
     </section>
 
@@ -465,6 +468,75 @@
                     </button>
                 </div>
                 <div class="insight-content text-morandi-text font-serif leading-relaxed text-justify whitespace-pre-line tracking-wide">約西亞從以色列各處將一切可憎之物盡都除掉，使以色列境內的人都事奉耶和華他們的神。約西亞在世的日子，就跟從耶和華他們列祖的神，總不離開。神在嚴厲的審判中，仍對「專心尋求祂、在祂面前自卑」的人存留極大的憐憫。約西亞的溫柔與敬畏，為他所在的世代換取了審判延期的平安盾牌。人若選擇自我與世界的成功，神的審判就無法避免，因為罪的工價就是死。求主賜下智慧，指教我們怎樣數算自己的日子！😇</div>
+            </article>
+
+            <article class="insight-card card-transition bg-morandi-card border-l-4 border-morandi-plum rounded-r-2xl rounded-l-md p-8 md:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300" data-book="主日講道">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-stone-200/50">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full text-sm md:text-base font-semibold bg-morandi-plum/15 text-morandi-plum">主日講道</span>
+                        <span class="card-title text-base md:text-lg font-bold tracking-wider text-morandi-text">從約沙法王學功課：在信心與軟弱之間</span>
+                    </div>
+                    <button class="copy-btn text-stone-400 hover:text-morandi-blue p-1 rounded-lg hover:bg-stone-100 transition-colors" title="複製此段筆記">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    </button>
+                </div>
+                <div class="insight-content sermon-content text-morandi-text font-serif leading-relaxed tracking-wide">
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-6 whitespace-pre-line border-l-2 border-morandi-plum/30 pl-4">經文：歷代志下 17–20章
+核心經文：歷代志下 20:12
+「我們無力抵擋這來攻擊我們的大軍，我們也不知道怎樣行，我們的眼目單仰望你。」</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">引言：歷代志下的約沙法</h3>
+                    <p class="mb-4 pl-1 text-justify">《列王紀》和《歷代志》都記載約沙法王，但目的不同。《列王紀》寫於被擄期間，重點是歷史警戒，回答「我們為何亡國、被擄？」它站在先知視角，記錄君王的順服與悖逆，也指出約沙法雖是好王，卻因與北國妥協，留下政治與屬靈的危機。</p>
+                    <p class="mb-4 pl-1 text-justify">《歷代志》寫於被擄歸回之後，重點是重建盼望，回答「我們是誰？神還顧念我們嗎？」它站在祭司視角，放大約沙法的宗教改革、敬拜讚美，鼓勵百姓：只要回轉尋求神，神必施行拯救。</p>
+                    <p class="mb-4 pl-1 text-justify">但歷代志下也沒有隱藏約沙法的缺點。他曾與惡王亞哈結盟，因錯誤的關係和判斷，差點把自己和國家帶進危險。今天我們從約沙法王學功課：當人活在信心與軟弱之間，仍然可以一次又一次回到神面前。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">一、國家的強盛，不只在領袖敬虔，也在百姓認識神</h3>
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-3 pl-1">經文：歷代志下 17:3–9</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法早期很寶貴的一點，是他不只是自己尋求神，也讓神的話重新被教導在百姓中間。他差派臣子、利未人、祭司到猶大各城教訓百姓，帶著耶和華的律法書，走遍猶大各城。</p>
+                    <p class="mb-4 pl-1 text-justify">這告訴我們，約沙法知道一個國家的穩固，不只是靠軍事、經濟、制度，也在於百姓是否認識神的話。約坦也是一個例子，他自己行耶和華眼中看為正的事，卻沒有帶來全民復興。歷代志下 27:6 說：「約坦在耶和華他神面前行正道，以致日漸強盛。」但同一章也說：「百姓還行邪僻的事。」領袖可以走正路，但百姓若沒有從心裡回轉，整個群體仍然救不起來。</p>
+                    <p class="mb-4 pl-1 text-justify">教會也是如此。不要只倚靠傳道人。一個健康的教會，不是少數人查經、禱告、關懷，其他人只是消費者；而是大家都在神的話語上得著共識，認同神給教會的方向。這不只是神對傳道人說的話，也是神親自對每個人說的話。沒有旁觀，而是參與。</p>
+                    <p class="mb-4 pl-1 text-justify">所以小組長、同工努力認識神的話，這是對的方向。群體真正的強盛，不是只靠少數屬靈的人撐住，而是眾人一起被神的話建立。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">二、敬虔的人，一不小心也會做錯決定</h3>
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-3 pl-1">經文：歷代志下 18:1–3；20:35–37</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法是敬虔的王，但他有一個明顯的軟弱：他與亞哈結親，又與亞哈一起出戰。亞哈是遠離神、拜偶像的王，約沙法卻因關係、政治利益或情面，進入不該進入的結盟。</p>
+                    <p class="mb-4 pl-1 text-justify">他可能有政治考量。南北國分裂後長期爭戰，約沙法登基初期也要防備以色列人。亞哈領導的北國軍事力量強大，約沙法可能想透過政治婚姻化解衝突，換取和平。問題是，錯誤的關係不會只停留在一代，亞哈的女兒亞他利雅後來差點剿滅猶大王室。</p>
+                    <p class="mb-4 pl-1 text-justify">更值得注意的是約沙法的性格。他一再妥協。亞哈邀請他攻打基列的拉末，他說：「你我不分彼此，我的民與你的民一樣。」後來他雖然要求先求問耶和華，但真先知米該雅已經清楚預言此戰必敗，他卻仍然上戰場。甚至亞哈提議自己改裝上陣，叫約沙法仍穿王服，他也照做，幾乎成為亞哈的替死鬼。</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法不是壞人，而像是一個好脾氣、重感情、卻缺乏屬靈底線的好人。一個敬虔的人，仍可能因著不完全的性格，做出糊塗的決定。</p>
+                    <p class="mb-4 pl-1 text-justify">基督徒的一生，得救以後不是停止，而是繼續得勝、繼續成聖。性格可以被神改變，核心信念也需要被真理更新。核心信念會影響思想，思想影響情緒，情緒影響行動，行動形成習慣，習慣塑造品格，品格影響生命。</p>
+                    <p class="mb-4 pl-1 text-justify">有些人把自己的表現和價值綁在一起，事情沒做好，就覺得自己是失敗的人、不值得被愛。但聖經說：「你們得救是本乎恩，也因著信；這並不是出於自己，乃是神所賜的。」又說：「惟有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。」神無條件的愛，才是我們價值的根基。我的失敗、挫折、犯罪，與我已被神所愛沒有衝突；失敗需要進步，犯罪需要悔改，但我在神眼中的價值沒有改變。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">三、失敗不是結束，而是回轉的機會</h3>
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-3 pl-1">經文：歷代志下 19:1–11</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法與亞哈結盟失敗後，先知耶戶出來責備他：「你豈當幫助惡人，愛那恨惡耶和華的人呢？」但神也指出：「然而你還有善行，因你從國中除掉木偶，立定心意尋求神。」</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法可貴的地方，是他沒有惱羞成怒，也沒有因失敗而放棄。他重新出去，引導百姓歸向耶和華，並設立審判官，提醒他們要敬畏神、公義判斷。他不是沒有錯，但他願意被神修正。</p>
+                    <p class="mb-4 pl-1 text-justify">人生的失敗也可能成為神祝福的轉機。很多時候，連「失敗」的定義都是自己給自己的。誰說沒有錢就是失敗，有錢就是成功？從神的角度來看，基督加上我，就是豐盛有意義的人生。危機中可能藏著神要更新我們的機會。</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法失敗了，但他回到神面前，讓神修正他。親愛的弟兄姊妹，問題不是我們永遠不會失敗，而是失敗的時候，願不願意來到神面前尋求祂。願意回轉的人，人生就充滿轉機。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">四、約沙法的禱告：在懼怕中尋求神</h3>
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-3 pl-1">經文：歷代志下 20:1–13</p>
+                    <p class="mb-4 pl-1 text-justify">後來摩押人、亞捫人和米烏尼人一同來攻擊約沙法。聖經很真實地說：「約沙法便懼怕，定意尋求耶和華。」</p>
+                    <p class="mb-4 pl-1 text-justify">這句話很安慰人。約沙法不是超人，他也會怕。但他的可貴不在於沒有懼怕，而在於懼怕時，他選擇尋求神。勇氣不是沒有恐懼，而是面對恐懼、勝過恐懼。</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法的禱告非常值得學習。第一，他認清神的權能：「你不是天上的神嗎？你不是萬邦萬國的主宰嗎？在你手中有大能大力，無人能抵擋你。」第二，他重申神的盟約，抓住神過去對亞伯拉罕和所羅門聖殿的應許。第三，他誠實面對無能：「我們無力抵擋這來攻擊我們的大軍，我們也不知道怎樣行。」第四，他專注於神：「我們的眼目單仰望你。」</p>
+                    <p class="mb-4 pl-1 text-justify">這是真信心。不是「我什麼都不怕」，而是「主啊，我怕，但我把眼目轉向你。」信心不是否認自己的無力，而是把自己的無力帶到神面前。</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法不只是自己禱告，他帶著全國禱告、禁食禱告，甚至帶著家庭一起禱告。屬靈習慣不是危機來了才臨時生出來。像但以理一樣，即使王下令三十天不可向王以外的任何神明祈求，他仍然一日三次禱告，「與素常一樣」。我們平常怎麼操練，危機中就怎麼反應。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">五、爭戰之前先讚美</h3>
+                    <p class="text-[0.85em] text-morandi-muted font-medium mb-3 pl-1">經文：歷代志下 20:14–30</p>
+                    <p class="mb-4 pl-1 text-justify">神藉雅哈悉宣告：「不要因這大軍恐懼驚惶；因為勝敗不在乎你們，乃在乎神。」約沙法和百姓聽見神的話，還沒有看見戰爭得勝，就先俯伏敬拜神。</p>
+                    <p class="mb-4 pl-1 text-justify">後來約沙法設立歌唱的人，穿上聖潔的禮服，走在軍前讚美耶和華說：「當稱謝耶和華，因他的慈愛永遠長存！」眾人方唱歌讚美的時候，耶和華就派伏兵擊殺敵人，敵軍彼此自相擊殺。</p>
+                    <p class="mb-4 pl-1 text-justify">這不是逃避現實的樂觀，而是信心的宣告：敵人很大，但神更大；危機真實，但神仍掌權；我還沒有看見結果，但我選擇先敬拜神。</p>
+                    <p class="mb-4 pl-1 text-justify">敬拜不只是唱詩歌，敬拜是重新排列心中的大小順序。當我們不敬拜神，問題就會變得最大；當我們敬拜神，不是問題消失，而是神重新成為我們眼中最大的那一位。</p>
+                    <p class="mb-4 pl-1 text-justify">「猶大」這個名字有讚美、感謝的意思。利亞生猶大時說：「這一次我要讚美耶和華。」士師記中，以色列人求問誰先上去爭戰，耶和華回答：「猶大要先上去。」屬靈上也提醒我們：爭戰之前，讚美先上。</p>
+                    <p class="mb-4 pl-1 text-justify">我們要問自己：我的心最近把什麼看得最大？是問題最大、人的評價最大、金錢最大、失敗最大，還是神最大？我們是否願意在還沒有看見答案以前，先用敬拜承認神掌權？</p>
+                    <p class="mb-4 pl-1 text-justify">敬拜不是等問題解決後才感謝神，而是在問題中宣告神仍然配得信靠。</p>
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">結論：信耶和華你們的神，就必立穩</h3>
+                    <p class="mb-4 pl-1 text-justify">約沙法的一生讓我們看見：人有信心，也有軟弱；會尋求神，也可能做錯決定；會經歷失敗，也能因著神的恩典重新回轉。</p>
+                    <p class="mb-4 pl-1 text-justify">所以今天的重點不是我們要成為完美的人，而是要學會在每一次軟弱、懼怕、失敗和爭戰中，重新把眼目轉向神。</p>
+                    <p class="mb-4 pl-1 text-justify">約沙法對百姓說：「信耶和華你們的神就必立穩；信他的先知就必亨通。」我們真正的盼望，不在於自己有多剛強，也不在於人生有多順利，而在於我們所信靠的是誰。</p>
+                    <p class="mb-4 pl-1 text-justify">願我們都能向神說：主啊，我們不知道怎樣行，但我們的眼目單單仰望祢。</p>
+                    <div class="mt-8 rounded-xl bg-morandi-plum/5 border border-morandi-plum/20 p-6">
+                    <h3 class="text-[1.25em] font-bold text-morandi-plum mt-8 mb-3 first:mt-0">結束禱告</h3>
+                    <p class="mb-3 text-morandi-text/90 italic leading-loose">親愛的阿爸天父，謝謝祢今天藉著約沙法王的生命提醒我們：我們有信心，也有軟弱；我們會尋求祢，也會做錯決定。但感謝祢，祢沒有放棄我們，祢仍然呼喚我們回到祢面前。</p>
+                    <p class="mb-3 text-morandi-text/90 italic leading-loose">主啊，求祢幫助我們不只聽見祢的話，更願意被祢的話建立；在關係和選擇中，保守我們不輕易妥協；當我們失敗時，賜給我們謙卑回轉的心。</p>
+                    <p class="mb-3 text-morandi-text/90 italic leading-loose">當我們害怕、無力、不知道怎樣行的時候，求祢幫助我們把眼目單單仰望祢。也讓我們在爭戰之前，先學會敬拜，因為祢是掌權的神。</p>
+                    <p class="mb-3 text-morandi-text/90 italic leading-loose">願祢成為我們生命真正的王，帶領我們走在祢喜悅的道路上。奉主耶穌基督的名禱告，阿們。</p>
+                    </div>
+                </div>
             </article>
 
             <!-- 空白提醒 -->
