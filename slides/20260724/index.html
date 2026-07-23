@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>當君王走向十字架｜馬太福音第十九章・查經班講章</title>
+    <!-- Tailwind CSS 3.4.15 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            bg: '#F2F1EC',       // 莫蘭迪暖灰白
+                            card: '#FAF9F6',     // 莫蘭迪絲絹白
+                            text: '#2C3033',     // 深霧灰黑
+                            muted: '#7A828A',    // 莫蘭迪中灰
+                            blue: '#8EA4B1',     // 莫蘭迪煙燻藍
+                            sage: '#9CAF9A',     // 莫蘭迪鼠尾草綠
+                            rose: '#C0A39E',     // 莫蘭迪霧粉
+                            ochre: '#C4B097',    // 莫蘭迪暖燕麥
+                            slate: '#606B73',    // 石板青
+                            plum: '#A88C93',     // 莫蘭迪紫棕
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: #2C3033;
+            color: #2C3033;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .serif { font-family: 'Noto Serif TC', serif; }
+
+        /* ---------- 舞台與投影片 ---------- */
+        .deck { position: relative; width: 100vw; height: 100vh; }
+
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden;
+            transform: translateX(40px);
+            transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+                        transform 0.5s cubic-bezier(0.4,0,0.2,1),
+                        visibility 0s linear 0.5s;
+        }
+        .slide.active {
+            opacity: 1; visibility: visible; transform: translateX(0);
+            transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+                        transform 0.5s cubic-bezier(0.4,0,0.2,1);
+            z-index: 10;
+        }
+
+        /* 16:9 卡片，內容過長可捲動（安全機制） */
+        .stage {
+            width: min(100vw, calc(100vh * 16 / 9));
+            height: min(100vh, calc(100vw * 9 / 16));
+            /* 莫蘭迪暖白 + 冷暖雙側微光漸層 */
+            background:
+                radial-gradient(120% 120% at 88% 6%, rgba(142,164,177,0.13), transparent 42%),
+                radial-gradient(110% 110% at 8% 100%, rgba(196,176,151,0.12), transparent 46%),
+                linear-gradient(150deg, #F6F5F0 0%, #EFEDE6 55%, #E6E3DA 100%);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4vmin 7vmin;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        .stage.pad-tight { padding: 4.5vmin 6vmin; }
+        .stage.center { align-items: center; justify-content: center; text-align: center; }
+
+        /* 封面：中央柔光 */
+        .stage.hero {
+            background:
+                radial-gradient(85% 70% at 50% 44%, rgba(156,175,154,0.18), transparent 60%),
+                linear-gradient(165deg, #FAF9F6 0%, #ECEAE2 100%);
+        }
+        /* 金句頁：頂部升起的煙燻藍光暈 */
+        .stage.quote {
+            background:
+                radial-gradient(130% 95% at 50% 0%, rgba(142,164,177,0.20), transparent 58%),
+                linear-gradient(160deg, #FAF9F6 0%, #EDEAE2 100%);
+        }
+
+        /* ---------- 排版元件（字級用 vmin，投影/螢幕皆清楚） ---------- */
+        .kicker {
+            display: inline-flex; align-items: center; gap: .6em;
+            font-size: 2vmin; letter-spacing: .28em; font-weight: 500;
+            color: #7A828A; margin-bottom: 1.6vmin;
+        }
+        .kicker .dot { width: 1.1vmin; height: 1.1vmin; border-radius: 999px; background: #9CAF9A; }
+        .s-title { font-size: 5vmin; font-weight: 700; line-height: 1.32; color: #2C3033; }
+        .body { font-size: 2.65vmin; line-height: 1.78; font-weight: 300; color: #2C3033; }
+        .body-sm { font-size: 2.3vmin; line-height: 1.72; font-weight: 300; color: #606B73; }
+
+        /* 條列 */
+        .li { display: flex; align-items: flex-start; gap: 1.5vmin; }
+        .li .mk { flex: none; font-weight: 700; color: #9CAF9A; font-size: 2.5vmin; line-height: 1.78; }
+
+        /* 兩欄對比 */
+        .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 3vmin; align-items: stretch; }
+        .col { background: rgba(250,249,246,0.75); border-radius: 1.6vmin; padding: 3vmin 3vmin; }
+        .col .clabel { font-size: 2.15vmin; letter-spacing: .1em; font-weight: 700; margin-bottom: 1.4vmin; }
+        .divider-v { width: 1px; background: linear-gradient(#0000, #C4B097, #0000); }
+
+        /* 結語金句高亮 */
+        .takeaway {
+            border-left: .5vmin solid #9CAF9A;
+            background: rgba(156,175,154,0.14);
+            padding: 2.4vmin 2.8vmin; border-radius: .4vmin;
+            font-size: 2.9vmin; line-height: 1.62; font-weight: 500; color: #2C3033;
+        }
+
+        /* 段落大標題頁 */
+        .divider-num { font-size: 12vmin; font-weight: 700; color: rgba(142,164,177,0.35); line-height: 1; }
+
+        /* 進度條與頁碼 */
+        .progress {
+            position: fixed; bottom: 0; left: 0; height: 4px;
+            background: #9CAF9A; z-index: 50; transition: width 0.4s ease;
+        }
+        .pager {
+            position: fixed; bottom: 14px; right: 18px;
+            color: #9CAF9A; font-size: 12px; letter-spacing: 2px; z-index: 50;
+        }
+    </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+    <!-- ============ 1. 封面 ============ -->
+    <section class="slide active">
+        <div class="stage center hero">
+            <span class="inline-block w-3 h-3 rounded-full bg-morandi-sage mb-7"></span>
+            <p class="text-morandi-plum tracking-[0.3em] mb-4" style="font-size:2.6vmin;">查經班・馬太福音第十九章</p>
+            <h1 class="serif font-bold text-morandi-text leading-tight" style="font-size:7vmin;">當君王走向十字架</h1>
+            <p class="serif text-morandi-slate mt-4" style="font-size:3.4vmin;">你願意把生命交給祂嗎？</p>
+            <div class="w-20 h-px bg-morandi-ochre mt-9 mb-7"></div>
+            <p class="text-morandi-muted font-light" style="font-size:2vmin;">2026 / 07 / 24　　使用 ← → 或空白鍵翻頁</p>
+        </div>
+    </section>
+
+    <!-- ============ 2. 大綱 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>全篇地圖</span>
+            <h2 class="s-title mb-1">五個「天國的回應」</h2>
+            <p class="body-sm mb-6">這一章看似談婚姻、孩子、財富、門徒，其實都在問同一件事：誰掌管我的生命？</p>
+            <div class="space-y-4">
+                <div class="li"><span class="mk serif">一</span><div class="body"><b class="font-medium">放下操控關係的權利</b>　<span class="text-morandi-muted body-sm">馬太 19:1–12</span></div></div>
+                <div class="li"><span class="mk serif">二</span><div class="body"><b class="font-medium">像孩子一樣空手領受</b>　<span class="text-morandi-muted body-sm">馬太 19:13–15</span></div></div>
+                <div class="li"><span class="mk serif">三</span><div class="body"><b class="font-medium">讓耶穌指出我們真正的主人</b>　<span class="text-morandi-muted body-sm">馬太 19:16–22</span></div></div>
+                <div class="li"><span class="mk serif">四</span><div class="body"><b class="font-medium">承認救恩在人不能，在神凡事都能</b>　<span class="text-morandi-muted body-sm">馬太 19:23–26</span></div></div>
+                <div class="li"><span class="mk serif">五</span><div class="body"><b class="font-medium">撇下之後仍不與神計算</b>　<span class="text-morandi-muted body-sm">馬太 19:27–30</span></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 3. 引言 段落頁 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">引言</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.6vmin; line-height:1.4;">人想保留退路，<br>耶穌卻走向十字架</h2>
+            <div class="w-16 h-px bg-morandi-ochre mt-6"></div>
+        </div>
+    </section>
+
+    <!-- ============ 4. 引言背景 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>本章的處境</span>
+            <h2 class="s-title mb-5">夾在兩次受難預言之間</h2>
+            <div class="body space-y-4">
+                <p>第十九章正位於耶穌<b class="font-medium text-morandi-slate">第二次與第三次受難預言之間</b>。</p>
+                <p>第十七章，祂已告訴門徒：人子將被交在人手裡、被殺、第三日復活；到第二十章，祂又第三次預告自己將被交給祭司長、文士和外邦人，被戲弄、鞭打、釘十字架。</p>
+                <p>因此，這一章不是一組與十字架無關的倫理問答。耶穌正走向耶路撒冷，也正在預備門徒明白——跟隨祂，不只是相信一些真理，而是接受一種<b class="font-medium text-morandi-slate">被十字架重新塑造的生命</b>。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 5. 這章出現的幾群人 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>登場的人</span>
+            <h2 class="s-title mb-5">不同的問題，同一個核心</h2>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-3.5 body">
+                <div class="li"><span class="mk">·</span><span>法利賽人問<b class="font-medium">離婚</b>的條件</span></div>
+                <div class="li"><span class="mk">·</span><span>門徒問<b class="font-medium">婚姻是否值得</b></span></div>
+                <div class="li"><span class="mk">·</span><span>人們帶<b class="font-medium">小孩子</b>到耶穌面前</span></div>
+                <div class="li"><span class="mk">·</span><span>財主追問<b class="font-medium">如何得永生</b></span></div>
+                <div class="li col-span-2"><span class="mk">·</span><span>彼得問：我們撇下所有跟從你，<b class="font-medium">將來要得甚麼</b>？</span></div>
+            </div>
+            <div class="takeaway mt-7">這些問題表面不同，背後卻有同一核心：<br>我可不可以跟隨神，卻仍然保留對自己生命的主權？</div>
+        </div>
+    </section>
+
+    <!-- ============ 6. 核心提問 引用頁 ============ -->
+    <section class="slide">
+        <div class="stage center quote">
+            <span class="text-morandi-ochre tracking-[0.28em] mb-6" style="font-size:1.6vmin;">全章的核心提問</span>
+            <blockquote class="serif text-morandi-text leading-relaxed" style="font-size:3.6vmin;">「我可不可以跟隨神，<br>卻仍然保留對自己生命的主權？」</blockquote>
+            <p class="body-sm mt-8 max-w-3xl">法利賽人想知道婚姻在甚麼條件下可以退出；財主想得永生，卻不願失去財富；彼得願意撇下所有，卻開始計算自己可以得到多少。</p>
+        </div>
+    </section>
+
+    <!-- ============ 7. 引言收束 ============ -->
+    <section class="slide">
+        <div class="stage center">
+            <p class="body max-w-3xl mb-8">人總想為自己保留退路、資產與回報；<br>耶穌卻正走向一條<b class="font-medium text-morandi-slate">沒有為自己保留</b>的道路。</p>
+            <div class="takeaway max-w-3xl text-left">當君王為我們捨去自己的生命時，我們是否願意把自己的<b>婚姻、選擇、地位、財富和未來</b>，都交在祂的手中？</div>
+        </div>
+    </section>
+
+    <!-- ============ 8. 段落一 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">一</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.4vmin; line-height:1.4;">天國的回應，<br>是放下操控關係的權利</h2>
+            <p class="text-morandi-muted tracking-widest mt-6" style="font-size:2.4vmin;">馬太福音 19:1–12</p>
+        </div>
+    </section>
+
+    <!-- ============ 9. 法利賽人的試探 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>看似婚姻，實為權力</span>
+            <h2 class="s-title mb-5">法利賽人的試探</h2>
+            <blockquote class="serif text-morandi-slate mb-5" style="font-size:3vmin;">「人無論甚麼緣故都可以休妻嗎？」</blockquote>
+            <div class="body space-y-4">
+                <p>這看似是婚姻問題，實際上是一個關於<b class="font-medium text-morandi-slate">權力</b>的問題。</p>
+                <p>當時不同的拉比學派，對「甚麼理由可以休妻」有寬有嚴的解釋——有人理解得很寬，只要丈夫對妻子不滿，就可以寫休書把她休掉。</p>
+                <p>然而，耶穌沒有立刻陷入條文之爭，反而把他們帶回<b class="font-medium text-morandi-slate">創造之初</b>：造男造女，人要離開父母、與妻子連合，二人成為一體。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 10. 對比：人問 vs 神問 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>天國與人的差異</span>
+            <h2 class="s-title mb-6">兩種截然不同的問題</h2>
+            <div class="compare">
+                <div class="col border-t-4 border-morandi-rose">
+                    <div class="clabel text-morandi-rose">人 關心的</div>
+                    <p class="serif text-morandi-text mb-3" style="font-size:2.7vmin;">「我在甚麼情況下可以離開？」</p>
+                    <p class="body-sm">最低限度的計算——我做到甚麼程度，就可以合法退出？</p>
+                </div>
+                <div class="divider-v"></div>
+                <div class="col border-t-4 border-morandi-sage">
+                    <div class="clabel text-morandi-sage">神 關心的</div>
+                    <p class="serif text-morandi-text mb-3" style="font-size:2.7vmin;">「神起初為甚麼使你們連合？」</p>
+                    <p class="body-sm">祂原初的心意——你是否願意忠於神所託付的盟約？</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 11. 耶穌的挑戰 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>耶穌真正挑戰的</span>
+            <h2 class="s-title mb-5">婚姻不是滿足自己的工具</h2>
+            <div class="body space-y-4">
+                <p>耶穌<b class="font-medium text-morandi-slate">不否認</b>婚姻中真實存在的罪、背叛與破裂，也不要求受傷的人無條件留在危險之中；祂承認淫亂可能撕裂婚姻關係。</p>
+                <p>但祂首先挑戰的，是人把婚姻當成滿足自己需要的工具：關係符合期待就保留，增加負擔就找合法離開的理由——中心仍然是「我」。</p>
+                <p>然而十字架是：基督<b class="font-medium text-morandi-slate">在我們還作罪人、拒絕祂的時候，仍為我們捨命</b>。所以基督徒的婚姻，是雙方都在十字架前學習——不再只問「你能為我提供甚麼」，而是問「我如何忠於神所託付的愛」。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 12. 婚姻或獨身 + 結語 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>婚姻，或獨身？</span>
+            <h2 class="s-title mb-5">都不是逃避委身的方法</h2>
+            <div class="body space-y-4">
+                <p>門徒聽見耶穌的要求便說：「人和妻子既是這樣，倒不如不娶。」——既然不能輕易退出，那乾脆不要進入。</p>
+                <p>但耶穌指出：<b class="font-medium text-morandi-slate">無論婚姻或獨身，都不是逃避委身的方法</b>。有人為天國的緣故選擇不婚，這同樣是把生命交給神的呼召。</p>
+            </div>
+            <div class="takeaway mt-6">天國的回應，是放下操控關係的權利——無論神把我放在哪一種生命狀態，我都不再以自我滿足為中心，而為天國忠心生活。</div>
+        </div>
+    </section>
+
+    <!-- ============ 13. 段落二 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">二</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.4vmin; line-height:1.4;">天國的回應，<br>是像孩子一樣空手領受</h2>
+            <p class="text-morandi-muted tracking-widest mt-6" style="font-size:2.4vmin;">馬太福音 19:13–15</p>
+        </div>
+    </section>
+
+    <!-- ============ 14. 門徒責備 / 耶穌接納 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>讓小孩子到我這裡來</span>
+            <h2 class="s-title mb-5">門徒責備，耶穌卻接納</h2>
+            <div class="body space-y-4">
+                <p>有人帶著小孩子來要耶穌按手禱告，門徒卻責備他們——大概認為耶穌即將進耶路撒冷有更重要的事，而孩子沒有權力、地位與成就，幫不上事工。</p>
+                <p>但耶穌說：「讓小孩子到我這裡來，不要禁止他們，因為在天國的，正是這樣的人。」</p>
+                <p>這不是說孩子天生無罪，也不是把孩子浪漫化。重點是：<b class="font-medium text-morandi-slate">孩子沒有可以向神誇耀的身分與成就，他們只能依賴、信任和領受。</b></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 15. 對比：孩子 vs 財主 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>刻意並排的兩個人</span>
+            <h2 class="s-title mb-6">空手的孩子，與帶著成績單的財主</h2>
+            <div class="compare">
+                <div class="col border-t-4 border-morandi-sage">
+                    <div class="clabel text-morandi-sage">孩子</div>
+                    <p class="body-sm">手中沒有功德、地位或財產，甚麼都沒有——<br><b class="font-medium text-morandi-text">卻被耶穌接納。</b></p>
+                </div>
+                <div class="divider-v"></div>
+                <div class="col border-t-4 border-morandi-rose">
+                    <div class="clabel text-morandi-rose">年輕財主</div>
+                    <p class="body-sm">帶著自己的道德成績單，擁有許多——<br><b class="font-medium text-morandi-text">最後卻憂憂愁愁地離開。</b></p>
+                </div>
+            </div>
+            <div class="takeaway mt-7">天國不是靠一個人擁有多少而進入，而是靠一個人是否願意<b>空手領受</b>。</div>
+        </div>
+    </section>
+
+    <!-- ============ 16. 應用 + 結語 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>我們的屬靈履歷</span>
+            <h2 class="s-title mb-5">恩典，不是頒給優秀者的獎品</h2>
+            <div class="body space-y-4">
+                <p>我們常以為需要先證明自己有價值，才能來到神面前——用服事、奉獻、道德、知識甚至受苦，建立自己的屬靈履歷。</p>
+                <p>但天國不是神頒給優秀者的獎品，而是<b class="font-medium text-morandi-slate">賜給無力拯救自己之人的恩典</b>。當君王走向十字架，祂不是幫已經夠好的人再進步一點，而是為不能救自己的人捨命。</p>
+            </div>
+            <div class="takeaway mt-6">我沒有甚麼可以交換神的恩典；我只能像孩子一樣來到基督面前，單純地接受祂。</div>
+        </div>
+    </section>
+
+    <!-- ============ 17. 段落三 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">三</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.4vmin; line-height:1.4;">天國的回應，<br>是讓耶穌指出我們真正的主人</h2>
+            <p class="text-morandi-muted tracking-widest mt-6" style="font-size:2.4vmin;">馬太福音 19:16–22</p>
+        </div>
+    </section>
+
+    <!-- ============ 18. 少年財主的問題 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>理想的宗教青年</span>
+            <h2 class="s-title mb-5">「我該做甚麼善事，才能得永生？」</h2>
+            <div class="body space-y-4">
+                <p>這人不是不認真——他渴望永生、關心善事、自認從小遵守誡命。從人的角度看，他幾乎是理想的宗教青年：<b class="font-medium text-morandi-slate">有道德、有財富、有地位，也對永生有興趣</b>。</p>
+                <p>但他的問題暴露了他的思維：「我還需要做哪一件事，才能把永生納入我已經擁有的生命？」</p>
+                <p>他不是一無所有地求拯救，<b class="font-medium text-morandi-slate">而是想在原有的人生上，再增加「永生」這項最終資產。</b></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 19. 耶穌的刀 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>切開敬虔的外表</span>
+            <h2 class="s-title mb-5">一把指出真正主人的刀</h2>
+            <div class="body space-y-4">
+                <p>少年人說「這一切我都遵守了，還缺少甚麼呢？」耶穌便說：<span class="serif text-morandi-slate">「可去變賣你所有的，分給窮人……你還要來跟從我。」</span></p>
+                <p>耶穌不是宣告所有基督徒都必須賣掉一切才能得救，<b class="font-medium text-morandi-slate">而是指出這個人生命中真正的主人</b>。他以為自己守全了誡命，卻沒察覺財富已經佔據神的位置。</p>
+                <p>這命令像一把刀，切開他敬虔的外表，顯明他的心：他想要永生，但更想保留財富；他想跟隨耶穌，但條件是耶穌不能碰他最深的安全感。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 20. 「不要碰我的……」 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>十字架對每個人的挑戰</span>
+            <h2 class="s-title mb-4">「主啊，我願意跟隨你——<span class="text-morandi-rose">只要你不要碰這一部分。</span>」</h2>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-3 body mt-2">
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我的婚姻選擇</span></div>
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我的財務安排</span></div>
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我的事業方向</span></div>
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我的人際關係</span></div>
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我的面子</span></div>
+                <div class="li"><span class="mk text-morandi-rose">✕</span><span>不要碰我對未來的規畫</span></div>
+            </div>
+            <div class="takeaway mt-6">然而，耶穌不是要成為我們生命中的一個重要部分。<b>祂是君王。</b></div>
+        </div>
+    </section>
+
+    <!-- ============ 21. 憂愁離開 + 結語 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>誰擁有最後的決定權</span>
+            <h2 class="s-title mb-5">他憂憂愁愁地走了</h2>
+            <div class="body space-y-4">
+                <p>耶穌真正在問的是：<span class="serif text-morandi-slate">「你願不願意不再以財富作你的保障，而以我作你的保障？」</span></p>
+                <p>經文說，少年人聽見這話，就憂憂愁愁地走了，因為他的產業很多。真正令人悲傷的，<b class="font-medium text-morandi-slate">不是他有很多財產，而是當基督與財產不能同時作主時，他選擇了財產</b>。</p>
+            </div>
+            <div class="takeaway mt-6">回應天國，是容許耶穌指出：在我的生命裡，究竟甚麼東西擁有最後的決定權？</div>
+        </div>
+    </section>
+
+    <!-- ============ 22. 段落四 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">四</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.2vmin; line-height:1.4;">天國的回應，是承認<br>救恩在人不能，在神凡事都能</h2>
+            <p class="text-morandi-muted tracking-widest mt-6" style="font-size:2.4vmin;">馬太福音 19:23–26</p>
+        </div>
+    </section>
+
+    <!-- ============ 23. 駱駝穿針 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>刻意誇張的圖像</span>
+            <h2 class="s-title mb-5">駱駝穿針的眼</h2>
+            <blockquote class="serif text-morandi-slate mb-5" style="font-size:3vmin;">「駱駝穿過針的眼，比財主進神的國還容易呢！」</blockquote>
+            <div class="body space-y-4">
+                <p>這是一幅刻意誇張、幾乎不可能的圖像。重點不是猜測「針眼」是不是耶路撒冷某道小門，而是強調：<b class="font-medium text-morandi-slate">人靠自己的能力進入天國，是不可能的。</b></p>
+                <p>門徒非常希奇：「這樣誰能得救呢？」——當時人普遍把財富視為蒙神賜福的象徵。若連有地位、有道德、有財富又追求永生的人都難進天國，那還有誰能得救？</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 24. 四個「不能」+ 核心 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>四個「不能」</span>
+            <h2 class="s-title mb-5">救恩，是人根本做不到</h2>
+            <div class="space-y-2.5 body mb-5">
+                <div class="li"><span class="mk">·</span><span>婚姻中的剛硬，人不能靠規條完全醫治。</span></div>
+                <div class="li"><span class="mk">·</span><span>人不能靠自己的純真變成孩子。</span></div>
+                <div class="li"><span class="mk">·</span><span>財主不能靠更多善行使自己得救。</span></div>
+                <div class="li"><span class="mk">·</span><span>門徒也不能靠撇下所有來購買天國的獎賞。</span></div>
+            </div>
+            <div class="takeaway">十字架不是神給的一個榜樣，讓我們努力模仿後自我拯救；<b>十字架首先是神親自完成我們無法完成的救恩。</b></div>
+        </div>
+    </section>
+
+    <!-- ============ 25. 福音核心金句 ============ -->
+    <section class="slide">
+        <div class="stage center quote">
+            <span class="text-morandi-ochre tracking-[0.28em] mb-6" style="font-size:1.6vmin;">整章的福音核心</span>
+            <blockquote class="serif text-morandi-text leading-relaxed" style="font-size:4.4vmin;">「在人這是不能的，<br>在神凡事都能。」</blockquote>
+            <cite class="not-italic text-morandi-muted mt-6" style="font-size:2.3vmin;">— 馬太福音 19:26</cite>
+            <p class="body-sm mt-7 max-w-2xl">回應天國，便是放下自救的驕傲，承認：我不只是需要更多指引，我需要神親自拯救我。</p>
+        </div>
+    </section>
+
+    <!-- ============ 26. 段落五 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">五</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.4vmin; line-height:1.4;">天國的回應，<br>是撇下之後仍不與神計算</h2>
+            <p class="text-morandi-muted tracking-widest mt-6" style="font-size:2.4vmin;">馬太福音 19:27–30</p>
+        </div>
+    </section>
+
+    <!-- ============ 27. 彼得的問題 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>神看見門徒所放下的</span>
+            <h2 class="s-title mb-5">「將來我們要得甚麼呢？」</h2>
+            <div class="body space-y-4">
+                <p>彼得的確與財主不同——財主放不下財富，彼得和門徒卻已離開漁船、家鄉和原有生活跟從耶穌。</p>
+                <p>耶穌也<b class="font-medium text-morandi-slate">沒有否定他們的付出</b>，反而應許他們在復興的國度中有分，並說凡為祂的名撇下房屋、親人或田地的，必要得著百倍，並且承受永生。</p>
+                <p>因此，跟隨基督不是沒有代價，也不是沒有應許。<b class="font-medium text-morandi-slate">神看見門徒所放下的一切。</b></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 28. 另一種危險：計算 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>把捨己變成屬靈資產</span>
+            <h2 class="s-title mb-5">放下以後，開始計算</h2>
+            <div class="body mb-4">
+                <p>財主的問題是<b class="font-medium text-morandi-rose">放不下</b>；彼得的問題則可能是放下以後開始盤算：「既然我付了這麼多，神欠我甚麼？」</p>
+            </div>
+            <div class="space-y-2 body-sm">
+                <div class="li"><span class="mk text-morandi-rose">›</span><span>我服事比別人久，所以應該得到更多尊重。</span></div>
+                <div class="li"><span class="mk text-morandi-rose">›</span><span>我奉獻比別人多，所以神應該使我更順利。</span></div>
+                <div class="li"><span class="mk text-morandi-rose">›</span><span>我為主犧牲家庭、工作或時間，所以教會應該照我的意思。</span></div>
+                <div class="li"><span class="mk text-morandi-rose">›</span><span>我已經跟隨主多年，所以應該比後來的人更重要。</span></div>
+            </div>
+            <p class="body-sm mt-4 text-morandi-slate">於是耶穌說：「有許多在前的，將要在後；在後的，將要在前。」——直接引向第二十章葡萄園工人的比喻。</p>
+        </div>
+    </section>
+
+    <!-- ============ 29. 兩種以自我為中心 + 結語 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>表面相反，實則相同</span>
+            <h2 class="s-title mb-6">抓住所有，或拿捨棄交換報酬</h2>
+            <div class="compare">
+                <div class="col border-t-4 border-morandi-rose">
+                    <div class="clabel text-morandi-rose">財主</div>
+                    <p class="serif text-morandi-text" style="font-size:2.6vmin;">「這是我的財富，<br>所以我不能放下。」</p>
+                </div>
+                <div class="divider-v"></div>
+                <div class="col border-t-4 border-morandi-rose">
+                    <div class="clabel text-morandi-rose">彼得</div>
+                    <p class="serif text-morandi-text" style="font-size:2.6vmin;">「這是我的犧牲，<br>所以神必須回報。」</p>
+                </div>
+            </div>
+            <div class="takeaway mt-7">天國的生命，既不是抓住所有，也不是拿捨棄交換報酬，而是<b>因為基督本身值得，所以跟隨祂</b>。</div>
+        </div>
+    </section>
+
+    <!-- ============ 30. 段落六：整章核心 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">六</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4vmin; line-height:1.45;">整章的核心：<br>不是你放下多少，<br>而是誰掌管你的生命</h2>
+            <div class="w-16 h-px bg-morandi-ochre mt-6"></div>
+        </div>
+    </section>
+
+    <!-- ============ 31. 彙整：自我掌權的方式 ============ -->
+    <section class="slide">
+        <div class="stage pad-tight">
+            <span class="kicker"><span class="dot"></span>耶穌逐一拆毀的</span>
+            <h2 class="s-title mb-5">五種自我掌權的方式</h2>
+            <div class="body-sm">
+                <div class="grid grid-cols-[7rem_1fr] gap-x-6 gap-y-0">
+                    <div class="py-3 border-b border-stone-300/50 font-medium text-morandi-slate">在婚姻上</div>
+                    <div class="py-3 border-b border-stone-300/50">想保留離開與掌控關係的權利。</div>
+                    <div class="py-3 border-b border-stone-300/50 font-medium text-morandi-slate">在孩子身上</div>
+                    <div class="py-3 border-b border-stone-300/50">按人的地位判斷誰值得親近耶穌。</div>
+                    <div class="py-3 border-b border-stone-300/50 font-medium text-morandi-slate">在財富上</div>
+                    <div class="py-3 border-b border-stone-300/50">不願交出自己的安全感。</div>
+                    <div class="py-3 border-b border-stone-300/50 font-medium text-morandi-slate">在救恩上</div>
+                    <div class="py-3 border-b border-stone-300/50">以為可以靠自己的善行完成。</div>
+                    <div class="py-3 font-medium text-morandi-slate">在門徒身上</div>
+                    <div class="py-3">彼得開始計算付出與回報。</div>
+                </div>
+            </div>
+            <p class="body-sm mt-4 text-morandi-slate">耶穌不是只來改善人的生活，<b class="font-medium">而是來作王</b>。</p>
+        </div>
+    </section>
+
+    <!-- ============ 32. 君王不是暴君 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>祂先把自己完全交出</span>
+            <h2 class="s-title mb-5">這位君王，不是掠奪的暴君</h2>
+            <div class="space-y-2.5 body-sm mb-5">
+                <div class="li"><span class="mk">·</span><span>祂要求婚姻中的信實，因為祂對祂的百姓<b class="font-medium text-morandi-text">信實到底</b>。</span></div>
+                <div class="li"><span class="mk">·</span><span>祂接納像孩子般無力的人，因為祂來<b class="font-medium text-morandi-text">尋找失喪的人</b>。</span></div>
+                <div class="li"><span class="mk">·</span><span>祂要求財主放下財富，因為祂本來富足，卻<b class="font-medium text-morandi-text">為我們成了貧窮</b>。</span></div>
+                <div class="li"><span class="mk">·</span><span>祂告訴門徒不要計算，因為祂將<b class="font-medium text-morandi-text">白白地把生命賜給不配的人</b>。</span></div>
+            </div>
+            <div class="takeaway">基督徒的捨己，不是用犧牲換取救恩，而是<b>因為先看見基督如何為我們捨己</b>。</div>
+        </div>
+    </section>
+
+    <!-- ============ 33. 結論 段落頁 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <div class="divider-num serif mb-4">結論</div>
+            <h2 class="serif font-bold text-morandi-text" style="font-size:4.4vmin; line-height:1.4;">當君王捨去自己，<br>我們還要抓住甚麼？</h2>
+            <div class="w-16 h-px bg-morandi-ochre mt-6"></div>
+        </div>
+    </section>
+
+    <!-- ============ 34. 四個反思提問 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>向每一個人提出</span>
+            <h2 class="s-title mb-6">留給我們的四個問題</h2>
+            <div class="space-y-5 body">
+                <div class="li"><span class="mk serif">1</span><span>在關係中，我最在意的是<b class="font-medium">忠於神</b>，還是<b class="font-medium">保留自己的權利</b>？</span></div>
+                <div class="li"><span class="mk serif">2</span><span>來到神面前時，我像孩子一樣<b class="font-medium">領受</b>，還是帶著自己的成績<b class="font-medium">要求肯定</b>？</span></div>
+                <div class="li"><span class="mk serif">3</span><span>當耶穌碰觸我的財富、安全感和人生規畫時，我<b class="font-medium">是否仍願意跟隨</b>？</span></div>
+                <div class="li"><span class="mk serif">4</span><span>當我為主有所撇下時，我是出於<b class="font-medium">愛</b>，還是暗中<b class="font-medium">期待神償還</b>？</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 35. 悲劇與盼望 ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>悲劇，與盼望</span>
+            <h2 class="s-title mb-5">最大的悲劇，最大的盼望</h2>
+            <div class="body space-y-4">
+                <p>少年財主最大的悲劇，是他<b class="font-medium text-morandi-slate">站在耶穌面前，卻因不能放下手中的東西而離開</b>。</p>
+                <p>而整章最大的盼望是：「在人這是不能的，在神凡事都能。」我們靠自己不能完全忠誠、不能真正謙卑、不能放下偶像、不能停止計算——</p>
+                <p>但耶穌走向十字架，不只是向我們提出要求，<b class="font-medium text-morandi-slate">更是要賜下赦免、更新與新的生命</b>。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 36. 真正的回應（對比） ============ -->
+    <section class="slide">
+        <div class="stage">
+            <span class="kicker"><span class="dot"></span>個人真正的回應</span>
+            <h2 class="s-title mb-6">不是這樣說，而是那樣說</h2>
+            <div class="space-y-5">
+                <div class="col border-l-4 border-morandi-rose">
+                    <div class="clabel text-morandi-rose">不是</div>
+                    <p class="serif text-morandi-slate" style="font-size:2.6vmin;">「主啊，我還要做甚麼，才能證明自己配得？」</p>
+                </div>
+                <div class="col border-l-4 border-morandi-sage">
+                    <div class="clabel text-morandi-sage">而是</div>
+                    <p class="serif text-morandi-text" style="font-size:2.2vmin; line-height:1.7;">「主啊，我所有的一切都是你所賜的；求你作我生命真正的王。即使你觸碰我最不願放下的地方，我仍願意相信你、跟隨你。」</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 37. 結尾金句 ============ -->
+    <section class="slide">
+        <div class="stage center quote">
+            <span class="inline-block w-3 h-3 rounded-full bg-morandi-sage mb-8"></span>
+            <p class="body max-w-2xl mb-2">天國不是得到耶穌以外更多的東西。</p>
+            <p class="text-morandi-muted mb-8" style="font-size:1.9vmin;">天國是發現——</p>
+            <blockquote class="serif font-bold text-morandi-text leading-relaxed" style="font-size:4vmin;">當我們得著基督，<br>我們已經得著真正的生命。</blockquote>
+            <div class="w-20 h-px bg-morandi-ochre mt-10"></div>
+        </div>
+    </section>
+
+</div>
+
+<div class="progress" id="progress"></div>
+<div class="pager" id="pager"></div>
+
+<script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let current = 0;
+
+    function show(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+        document.getElementById('progress').style.width =
+            ((current + 1) / slides.length * 100) + '%';
+        document.getElementById('pager').textContent =
+            (current + 1) + ' / ' + slides.length;
+    }
+    function next() { show(current + 1); }
+    function prev() { show(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+        else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+        else if (e.key === 'Home') show(0);
+        else if (e.key === 'End') show(slides.length - 1);
+        else if (e.key === 'f') document.documentElement.requestFullscreen?.();
+    });
+
+    // 點左半／右半翻頁（觸控友善）
+    document.getElementById('deck').addEventListener('click', (e) => {
+        if (e.clientX > window.innerWidth / 2) next(); else prev();
+    });
+
+    show(0);
+</script>
+</body>
+</html>
