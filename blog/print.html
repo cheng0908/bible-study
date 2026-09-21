@@ -82,6 +82,12 @@
             </div>
 
             <div class="flex flex-wrap items-start gap-x-6 gap-y-4">
+                <!-- 月份範圍 -->
+                <label class="flex flex-col gap-1">
+                    <span class="text-sm md:text-base text-morandi-muted font-medium">月份範圍</span>
+                    <select id="dateSelect" class="appearance-none bg-white border border-stone-300/60 text-morandi-text py-2 px-4 rounded-xl text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-morandi-blue/40 cursor-pointer shadow-sm min-w-[130px]"></select>
+                </label>
+
                 <!-- 書卷範圍 -->
                 <label class="flex flex-col gap-1">
                     <span class="text-sm md:text-base text-morandi-muted font-medium">書卷範圍</span>
@@ -139,11 +145,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 來源檔 (可用 ?src= 指定，預設為本月份心得)
+            // 來源檔 (可用 ?src= 指定，預設為總覽頁的資料檔)
             const params = new URLSearchParams(location.search);
-            const SRC = params.get('src') || '2026-06-reading-notes.html';
+            const SRC = params.get('src') || 'reading-notes.jsonl';
 
             const bookSelect = document.getElementById('bookSelect');
+            const dateSelect = document.getElementById('dateSelect');
             const noteList = document.getElementById('noteList');
             const toggleAll = document.getElementById('toggleAll');
             const fontDec = document.getElementById('fontDec');
@@ -155,16 +162,16 @@
             const pdfBody = document.getElementById('pdfBody');
             const paper = document.getElementById('paper');
 
-            // 各書卷對應的強調色 (與心得頁一致)
-            const ACCENT = {
-                '創世記': '#9CAF9A',
-                '出埃及記': '#C0A39E',
-                '列王紀下': '#606B73',
-                '歷代志上': '#C4B097',
-                '歷代志下': '#8EA4B1',
-                '主日講道': '#A88C93',
+            // 莫蘭迪色票 (與心得頁 tailwind.config 一致)，依資料裡的 color 欄位對應
+            const COLOR_HEX = {
+                sage: '#9CAF9A',
+                rose: '#C0A39E',
+                slate: '#606B73',
+                ochre: '#C4B097',
+                blue: '#8EA4B1',
+                plum: '#A88C93',
             };
-            const accentOf = (book) => ACCENT[book] || '#8EA4B1';
+            const accentOf = (note) => COLOR_HEX[note.color] || '#8EA4B1';
 
             // 內文字級 (pt)
             let fontSize = 15;
@@ -174,24 +181,52 @@
                 fontDisplay.textContent = fontSize + ' pt';
             }
 
+            function formatDateLabel(dateStr) {
+                const [y, m] = dateStr.split('-');
+                return `${y}年${m}月`;
+            }
+
+            // 從標題取出章節數字 (去掉書卷名稱後，第一個數字視為章數) 供排序使用
+            function chapterOf(note) {
+                if (note.type === 'sermon') return Infinity;
+                const rest = note.title.replace(note.book, '').trim();
+                const m = rest.match(/\d+/);
+                return m ? parseInt(m[0], 10) : 0;
+            }
+
             let notes = [];
 
-            // 1. 讀取來源心得頁並解析出每一篇
+            // 把一篇主日講道的結構化內容 (top/sections/prayer) 攤平成一段可列印的純文字
+            function flattenSermon(rec) {
+                const parts = [];
+                if (rec.top && rec.top.length) parts.push(rec.top.join('\n'));
+                (rec.sections || []).forEach(sec => {
+                    const lines = [sec.heading];
+                    if (sec.verse) lines.push(sec.verse);
+                    lines.push(...sec.paragraphs);
+                    parts.push(lines.join('\n'));
+                });
+                if (rec.prayer && rec.prayer.length) {
+                    parts.push(['結束禱告', ...rec.prayer].join('\n'));
+                }
+                return parts.join('\n\n');
+            }
+
+            // 1. 讀取心得資料檔 (JSONL，一行一筆 JSON) 並解析出每一篇
             try {
                 const res = await fetch(SRC, { cache: 'no-cache' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
-                const html = await res.text();
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                doc.querySelectorAll('.insight-card').forEach((card, i) => {
-                    const book = card.getAttribute('data-book') || '';
-                    const titleEl = card.querySelector('.card-title');
-                    const contentEl = card.querySelector('.insight-content');
-                    if (!contentEl) return;
+                const text = await res.text();
+                const records = text.split('\n').map(l => l.trim()).filter(Boolean).map(l => JSON.parse(l));
+                records.forEach((rec, i) => {
                     notes.push({
                         index: i,
-                        book,
-                        title: (titleEl ? titleEl.textContent : book).trim(),
-                        content: contentEl.textContent.trim(),
+                        type: rec.type,
+                        book: rec.book,
+                        date: rec.date,
+                        color: rec.color,
+                        title: rec.type === 'sermon' ? rec.title : rec.ref,
+                        content: rec.type === 'sermon' ? flattenSermon(rec) : rec.text,
                     });
                 });
                 if (!notes.length) throw new Error('找不到任何心得');
@@ -200,17 +235,27 @@
                 return;
             }
 
-            // 2. 建立書卷選單 (依出現順序，不重複)
+            // 2. 建立書卷選單 (依出現順序，不重複)；並依「書卷 → 章節」排序內容供列印
             const books = [...new Set(notes.map(n => n.book))];
+            notes.sort((a, b) => {
+                const diff = books.indexOf(a.book) - books.indexOf(b.book);
+                return diff !== 0 ? diff : chapterOf(a) - chapterOf(b);
+            });
             bookSelect.innerHTML = '<option value="all">所有書卷</option>'
                 + books.map(b => `<option value="${b}">${b}</option>`).join('');
 
+            // 建立月份選單 (依日期由舊到新)
+            const dates = [...new Set(notes.map(n => n.date))].sort();
+            dateSelect.innerHTML = '<option value="all">所有月份</option>'
+                + dates.map(d => `<option value="${d}">${formatDateLabel(d)}</option>`).join('');
+
             const esc = (s) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-            // 目前書卷範圍內的心得
+            // 目前書卷 + 月份範圍內的心得
             function notesInScope() {
                 const book = bookSelect.value;
-                return notes.filter(n => book === 'all' || n.book === book);
+                const date = dateSelect.value;
+                return notes.filter(n => (book === 'all' || n.book === book) && (date === 'all' || n.date === date));
             }
 
             // 3. 依書卷重建篇章複選清單 (預設全部勾選)
@@ -220,7 +265,7 @@
                     <label class="flex items-start gap-2 cursor-pointer py-0.5">
                         <input type="checkbox" class="note-chk mt-1 w-4 h-4 accent-morandi-slate" value="${n.index}" checked>
                         <span class="text-sm md:text-base text-morandi-text leading-snug">
-                            <span class="text-xs font-semibold mr-1" style="color:${accentOf(n.book)};">${esc(n.book)}</span>${esc(n.title)}
+                            <span class="text-xs font-semibold mr-1" style="color:${accentOf(n)};">${esc(n.book)}</span>${esc(n.title)}
                         </span>
                     </label>
                 `).join('');
@@ -238,8 +283,10 @@
             // 5. 封面範圍描述
             function scopeLabel(list) {
                 const scope = notesInScope();
+                const bookPart = bookSelect.value === 'all' ? '全部心得' : '《' + bookSelect.value + '》';
+                const datePart = dateSelect.value === 'all' ? '' : formatDateLabel(dateSelect.value);
                 if (list.length === scope.length) {
-                    return bookSelect.value === 'all' ? '全部心得' : '《' + bookSelect.value + '》';
+                    return datePart ? datePart + ' ' + bookPart : bookPart;
                 }
                 if (list.length === 1) return list[0].title;
                 return '精選 ' + list.length + ' 篇';
@@ -276,9 +323,9 @@
 
                 // 各篇心得
                 html += list.map(n => `
-                    <article class="pdf-entry pdf-content mb-10 pb-8 border-b border-stone-200" style="border-left: 4px solid ${accentOf(n.book)}; padding-left: 18px;">
+                    <article class="pdf-entry pdf-content mb-10 pb-8 border-b border-stone-200" style="border-left: 4px solid ${accentOf(n)}; padding-left: 18px;">
                         <div class="pdf-entry-head flex items-baseline gap-3 mb-4">
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full" style="color:${accentOf(n.book)}; background:${accentOf(n.book)}1A;">${esc(n.book)}</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full" style="color:${accentOf(n)}; background:${accentOf(n)}1A;">${esc(n.book)}</span>
                             <h2 class="text-xl md:text-2xl font-bold tracking-wider text-morandi-text">${esc(n.title)}</h2>
                         </div>
                         <p class="text-justify text-morandi-text" style="white-space: pre-line;">${esc(n.content)}</p>
@@ -295,6 +342,7 @@
 
             // 事件
             bookSelect.addEventListener('change', () => { rebuildNoteList(); render(); });
+            dateSelect.addEventListener('change', () => { rebuildNoteList(); render(); });
             toggleAll.addEventListener('click', () => {
                 const boxes = [...noteList.querySelectorAll('.note-chk')];
                 const allChecked = boxes.every(b => b.checked);
@@ -306,9 +354,11 @@
             fontInc.addEventListener('click', () => { if (fontSize < FONT_MAX) { fontSize++; applyFontSize(); } });
             printBtn.addEventListener('click', () => window.print());
 
-            // 初始預設 (可用 ?book= 預先指定書卷)
+            // 初始預設 (可用 ?book= 預先指定書卷、?date= 預先指定月份)
             const preBook = params.get('book');
             if (preBook && books.includes(preBook)) bookSelect.value = preBook;
+            const preDate = params.get('date');
+            if (preDate && dates.includes(preDate)) dateSelect.value = preDate;
 
             applyFontSize();
             rebuildNoteList();
